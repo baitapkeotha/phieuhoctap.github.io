@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bài tập kéo thả – Chương 1 Toán 11</title>
+<title>Bài tập kéo thả cảm ứng – Chương 1 Toán 11</title>
 <style>
   body {
     font-family: "Segoe UI", sans-serif;
-    background-color: #f8fbff;
+    background-color: #f4f8ff;
     margin: 20px;
     color: #222;
   }
@@ -25,7 +25,7 @@
   .dropzone {
     display: inline-block;
     min-width: 100px;
-    min-height: 25px;
+    min-height: 30px;
     border: 2px dashed #ccc;
     border-radius: 5px;
     padding: 3px;
@@ -35,11 +35,16 @@
   .answer {
     display: inline-block;
     background: #e3f2fd;
-    padding: 5px 10px;
+    padding: 8px 12px;
     margin: 5px;
     border-radius: 5px;
     border: 1px solid #90caf9;
-    cursor: grab;
+    cursor: pointer;
+    user-select: none;
+  }
+  .selected {
+    background: #1976d2;
+    color: white;
   }
   .correct {
     background: #c8e6c9 !important;
@@ -76,49 +81,51 @@
 <div class="question">9. cos(π – x) = <span class="dropzone" data-answer="-cos(x)"></span>.</div>
 <div class="question">10. tan(α + β) = <span class="dropzone" data-answer="(tanα+tanβ)/(1−tanαtanβ)"></span>.</div>
 
-<h3>Kéo đáp án đúng vào ô trống:</h3>
+<h3>Chọn đáp án rồi chạm vào ô trống để thả:</h3>
 <div id="answers">
-  <div class="answer" draggable="true" data-value="1">1</div>
-  <div class="answer" draggable="true" data-value="2π">2π</div>
-  <div class="answer" draggable="true" data-value="(2k+1)π/2">(2k+1)π/2</div>
-  <div class="answer" draggable="true" data-value="cos(x)">cos(x)</div>
-  <div class="answer" draggable="true" data-value="lẻ">lẻ</div>
-  <div class="answer" draggable="true" data-value="-cos(x)">-cos(x)</div>
-  <div class="answer" draggable="true" data-value="(tanα+tanβ)/(1−tanαtanβ)">(tanα+tanβ)/(1−tanαtanβ)</div>
-  <div class="answer" draggable="true" data-value="sin(x)">sin(x)</div>
-  <div class="answer" draggable="true" data-value="π/2">π/2</div>
-  <div class="answer" draggable="true" data-value="tan(x)">tan(x)</div>
+  <div class="answer" data-value="1">1</div>
+  <div class="answer" data-value="2π">2π</div>
+  <div class="answer" data-value="(2k+1)π/2">(2k+1)π/2</div>
+  <div class="answer" data-value="cos(x)">cos(x)</div>
+  <div class="answer" data-value="lẻ">lẻ</div>
+  <div class="answer" data-value="-cos(x)">-cos(x)</div>
+  <div class="answer" data-value="(tanα+tanβ)/(1−tanαtanβ)">(tanα+tanβ)/(1−tanαtanβ)</div>
+  <div class="answer" data-value="sin(x)">sin(x)</div>
+  <div class="answer" data-value="π/2">π/2</div>
+  <div class="answer" data-value="tan(x)">tan(x)</div>
 </div>
 
 <button onclick="checkAnswers()">Kiểm tra</button>
 <button onclick="resetQuiz()">Làm lại</button>
 
 <script>
-const answers = document.querySelectorAll('.answer');
-const dropzones = document.querySelectorAll('.dropzone');
-let dragged = null;
+let selectedAnswer = null;
 
-answers.forEach(ans => {
-  ans.addEventListener('dragstart', () => dragged = ans);
-  ans.addEventListener('dragend', () => dragged = null);
+document.querySelectorAll('.answer').forEach(ans => {
+  ans.addEventListener('click', () => {
+    document.querySelectorAll('.answer').forEach(a => a.classList.remove('selected'));
+    selectedAnswer = ans;
+    ans.classList.add('selected');
+  });
 });
 
-dropzones.forEach(zone => {
-  zone.addEventListener('dragover', e => e.preventDefault());
-  zone.addEventListener('drop', e => {
-    e.preventDefault();
-    if (dragged) {
+document.querySelectorAll('.dropzone').forEach(zone => {
+  zone.addEventListener('click', () => {
+    if (selectedAnswer) {
+      // Nếu ô trống đã có đáp án, trả lại vào vùng gốc
       if (zone.firstChild) {
         document.getElementById('answers').appendChild(zone.firstChild);
       }
-      zone.appendChild(dragged);
+      zone.appendChild(selectedAnswer);
+      selectedAnswer.classList.remove('selected');
+      selectedAnswer = null;
     }
   });
 });
 
 function checkAnswers() {
   let correct = 0;
-  dropzones.forEach(zone => {
+  document.querySelectorAll('.dropzone').forEach(zone => {
     const child = zone.firstChild;
     if (child && child.dataset.value === zone.dataset.answer) {
       zone.classList.add('correct');
@@ -133,12 +140,14 @@ function checkAnswers() {
 }
 
 function resetQuiz() {
-  dropzones.forEach(zone => {
+  document.querySelectorAll('.dropzone').forEach(zone => {
     if (zone.firstChild) {
       document.getElementById('answers').appendChild(zone.firstChild);
     }
     zone.classList.remove('correct', 'incorrect');
   });
+  document.querySelectorAll('.answer').forEach(a => a.classList.remove('selected'));
+  selectedAnswer = null;
 }
 </script>
 
